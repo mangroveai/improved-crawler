@@ -28,19 +28,5 @@ job.init(args["JOB_NAME"], args)
 datasource = glueContext.create_dynamic_frame.from_catalog(
     database=db, table_name=raw_table, transformation_ctx="datasource"
 )
-df = datasource.toDF()
-
-if len(df.columns) != 0:
-
-    gluedf = DynamicFrame.fromDF(glueContext, "gluedf")
-
-    sink = glueContext.getSink(
-        connection_type="s3",
-        path=f"s3://{bucket}{s3_path}",
-        enableUpdateCatalog=True,
-        updateBehavior="UPDATE_IN_DATABASE",
-    )
-    sink.setFormat("glueparquet")
-    sink.setCatalogInfo(catalogDatabase=db, catalogTableName=repartitioned_table)
-    sink.writeFrame(gluedf)
+# Your job here
 job.commit()

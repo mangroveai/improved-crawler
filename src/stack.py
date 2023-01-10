@@ -89,7 +89,7 @@ class CrawlerStack(Stack):
             executable=glue_alpha.JobExecutable.python_etl(
                 glue_version=glue_alpha.GlueVersion.V3_0,
                 python_version=glue_alpha.PythonVersion.THREE,
-                script=glue_alpha.Code.from_asset("glue_job/parquet.py"),
+                script=glue_alpha.Code.from_asset("glue_job/job.py"),
             ),
             timeout=Duration.minutes(15),
             max_capacity=2,
