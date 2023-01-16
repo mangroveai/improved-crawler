@@ -63,7 +63,7 @@ class CrawlerStack(Stack):
 
         bucket.add_object_created_notification(
             s3n.SnsDestination(crawler_event_topic),
-            s3.NotificationKeyFilter(prefix="misc/db/"),
+            s3.NotificationKeyFilter(prefix="data/db/"),
         )
 
         crawler = glue.CfnCrawler(
@@ -156,7 +156,7 @@ class CrawlerStack(Stack):
                                         "FilterRules": [
                                             {
                                                 "Name": "prefix",
-                                                "Value": "misc/db/",
+                                                "Value": "data/db/",
                                             },
                                         ]
                                     }
