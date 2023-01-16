@@ -20,7 +20,7 @@ class CrawlerStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        bucket = s3.Bucket(self, "bucket")
+        bucket = s3.Bucket(self, "bucket", event_bridge_enabled=True)
 
         glue_database = glue_alpha.Database(self, "GlueDB", database_name="db")
 
@@ -59,6 +59,11 @@ class CrawlerStack(Stack):
         crawler_event_topic = sns.Topic(self, "Topic crawler")
         crawler_event_topic.add_subscription(
             subscriptions.SqsSubscription(crawler_event_queue)
+        )
+
+        bucket.add_object_created_notification(
+            s3n.SnsDestination(crawler_event_topic),
+            s3.NotificationKeyFilter(prefix="misc/db/"),
         )
 
         crawler = glue.CfnCrawler(
@@ -133,13 +138,6 @@ class CrawlerStack(Stack):
             workflow_name=workflow.ref,
         )
 
-        topic = sns.Topic(self, "Topic Image Ready")
-
-        dead_letter_queue = sqs.Queue(self, "Dead Letter Queue")
-        dlq = sqs.DeadLetterQueue(max_receive_count=3, queue=dead_letter_queue)
-        queue = sqs.Queue(self, "Queue", dead_letter_queue=dlq)
-        topic.add_subscription(subscriptions.SqsSubscription(queue))
-
         aws_custom = cr.AwsCustomResource(
             self,
             "bucket notificaation",
@@ -151,19 +149,19 @@ class CrawlerStack(Stack):
                     "NotificationConfiguration": {
                         "TopicConfigurations": [
                             {
-                                "Events": ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"],
+                                "Events": ["s3:ObjectCreated:*"],
                                 "TopicArn": crawler_event_topic.topic_arn,
                                 "Filter": {
                                     "Key": {
                                         "FilterRules": [
                                             {
                                                 "Name": "prefix",
-                                                "Value": "{S3_PATH}{NEW_TABLE}/",
+                                                "Value": "misc/db/",
                                             },
                                         ]
                                     }
                                 },
-                                "Id": crawler.ref,  # the important part if you want the crawler to read the message
+                                "Id": crawler.ref,
                             }
                         ]
                     },
@@ -175,7 +173,7 @@ class CrawlerStack(Stack):
                 action="putBucketNotificationConfiguration",
                 parameters={
                     "Bucket": bucket.bucket_name,
-                    "NotificationConfiguration": {},  # Be careful, it will delete all of your bucket notifications
+                    "NotificationConfiguration": {},
                 },
                 physical_resource_id=cr.PhysicalResourceId.of("notif-" + crawler.ref),
             ),
@@ -183,7 +181,7 @@ class CrawlerStack(Stack):
                 statements=[
                     iam.PolicyStatement(
                         actions=["s3:PutBucketNotification*"], resources=["*"]
-                    )
+                    ),
                 ]
             ),
         )
