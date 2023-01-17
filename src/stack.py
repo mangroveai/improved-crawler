@@ -3,7 +3,6 @@ from aws_cdk import aws_glue as glue
 from aws_cdk import aws_glue_alpha as glue_alpha
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_s3 as s3
-from aws_cdk import aws_s3_notifications as s3n
 from aws_cdk import aws_sns as sns
 from aws_cdk import aws_sns_subscriptions as subscriptions
 from aws_cdk import aws_sqs as sqs
@@ -11,9 +10,8 @@ from aws_cdk import custom_resources as cr
 from constructs import Construct
 
 RAW_TABLE = "db"
-S3_PATH = "data/"
 NEW_TABLE = "new_table"
-# The S3 path where you will upload your dta will be "s3://{bucket.bucket_name}/{S3_PATH}{RAW_TABLE}/
+# The S3 path where you will upload your dta will be "s3://{bucket.bucket_name}/{RAW_TABLE}/
 
 
 class CrawlerStack(Stack):
@@ -61,9 +59,17 @@ class CrawlerStack(Stack):
             subscriptions.SqsSubscription(crawler_event_queue)
         )
 
-        bucket.add_object_created_notification(
-            s3n.SnsDestination(crawler_event_topic),
-            s3.NotificationKeyFilter(prefix="data/db/"),
+        topic_policy = sns.TopicPolicy(
+            self, "TopicPolicy", topics=[crawler_event_topic]
+        )
+
+        topic_policy.document.add_statements(
+            iam.PolicyStatement(
+                actions=["sns:Publish"],
+                principals=[iam.ServicePrincipal("s3.amazonaws.com")],
+                resources=[crawler_event_topic.topic_arn],
+                conditions={"ArnLike": {"aws:SourceArn": bucket.bucket_arn}},
+            )
         )
 
         crawler = glue.CfnCrawler(
@@ -72,7 +78,7 @@ class CrawlerStack(Stack):
             targets=glue.CfnCrawler.TargetsProperty(
                 s3_targets=[
                     glue.CfnCrawler.S3TargetProperty(
-                        path=f"s3://{bucket.bucket_name}/{S3_PATH}{RAW_TABLE}/",
+                        path=f"s3://{bucket.bucket_name}/{RAW_TABLE}/",
                         event_queue_arn=crawler_event_queue.queue_arn,
                     )
                 ]
@@ -103,7 +109,6 @@ class CrawlerStack(Stack):
                 "--db": glue_database.database_name,
                 "--raw_table": RAW_TABLE,
                 "--repartitioned_table": NEW_TABLE,
-                "--s3_path": f"/{S3_PATH}{NEW_TABLE}/",
             },
         )
         bucket.grant_read_write(job)
@@ -116,7 +121,7 @@ class CrawlerStack(Stack):
             actions=[glue.CfnTrigger.ActionProperty(crawler_name=crawler.ref)],
             type="SCHEDULED",
             workflow_name=workflow.ref,
-            schedule="cron(0 */6 * * ? *)",
+            schedule="cron(0 */6 * * ? *)",  # every 6 hours
             start_on_creation=True,
         )
 
@@ -149,19 +154,19 @@ class CrawlerStack(Stack):
                     "NotificationConfiguration": {
                         "TopicConfigurations": [
                             {
-                                "Events": ["s3:ObjectCreated:*"],
+                                "Events": ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"],
                                 "TopicArn": crawler_event_topic.topic_arn,
                                 "Filter": {
                                     "Key": {
                                         "FilterRules": [
                                             {
                                                 "Name": "prefix",
-                                                "Value": "data/db/",
+                                                "Value": f"{RAW_TABLE}/",
                                             },
                                         ]
                                     }
                                 },
-                                "Id": crawler.ref,
+                                "Id": crawler.ref,  # important part if you want the crawler to read the event
                             }
                         ]
                     },
@@ -173,7 +178,7 @@ class CrawlerStack(Stack):
                 action="putBucketNotificationConfiguration",
                 parameters={
                     "Bucket": bucket.bucket_name,
-                    "NotificationConfiguration": {},
+                    "NotificationConfiguration": {},  # Be careful, it will delete all of your bucket notifs
                 },
                 physical_resource_id=cr.PhysicalResourceId.of("notif-" + crawler.ref),
             ),

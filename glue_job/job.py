@@ -15,7 +15,6 @@ args = getResolvedOptions(
 )
 
 bucket = args["bucket"]
-s3_path = args["s3_path"]
 db = args["db"]
 raw_table = args["raw_table"]
 repartitioned_table = args["repartitioned_table"]
