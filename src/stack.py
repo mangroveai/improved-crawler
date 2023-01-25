@@ -18,7 +18,7 @@ class CrawlerStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        bucket = s3.Bucket(self, "bucket", event_bridge_enabled=True)
+        bucket = s3.Bucket(self, "bucket")
 
         glue_database = glue_alpha.Database(self, "GlueDB", database_name="db")
 
@@ -145,7 +145,7 @@ class CrawlerStack(Stack):
 
         aws_custom = cr.AwsCustomResource(
             self,
-            "bucket notificaation",
+            "bucket notification",
             on_create=cr.AwsSdkCall(
                 service="S3",
                 action="putBucketNotificationConfiguration",
@@ -168,7 +168,34 @@ class CrawlerStack(Stack):
                                 },
                                 "Id": crawler.ref,  # important part if you want the crawler to read the event
                             }
-                        ]
+                        ],
+                    },
+                },
+                physical_resource_id=cr.PhysicalResourceId.of("notif-" + crawler.ref),
+            ),
+            on_update=cr.AwsSdkCall(
+                service="S3",
+                action="putBucketNotificationConfiguration",
+                parameters={
+                    "Bucket": bucket.bucket_name,
+                    "NotificationConfiguration": {
+                        "TopicConfigurations": [
+                            {
+                                "Events": ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"],
+                                "TopicArn": crawler_event_topic.topic_arn,
+                                "Filter": {
+                                    "Key": {
+                                        "FilterRules": [
+                                            {
+                                                "Name": "prefix",
+                                                "Value": f"{RAW_TABLE}/",
+                                            },
+                                        ]
+                                    }
+                                },
+                                "Id": crawler.ref,  # important part if you want the crawler to read the event
+                            }
+                        ],
                     },
                 },
                 physical_resource_id=cr.PhysicalResourceId.of("notif-" + crawler.ref),
