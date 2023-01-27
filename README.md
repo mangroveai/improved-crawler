@@ -8,7 +8,7 @@ curl -sSL https://install.python-poetry.org | python3 -
 ```
 To install poetry.
 ```
-poetry intsall
+poetry install
 ```
 to install the required libraries and then :
 ```
