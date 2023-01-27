@@ -3,6 +3,10 @@ A CDK example of a crawler that works like in : https://docs.aws.amazon.com/glue
 
 To deploy the project you will just have to do :
 ```
+poetry install
+```
+to install the required libraries and then :
+```
 cdk deploy
 ```
 

@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "improved-crawler"
+version = "0.1.0"
+description = ""
+authors = ["eympoin <revok98@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+aws-cdk-lib = "2.39.1"
+constructs = "10.1.231"
+"aws-cdk.aws-glue-alpha" = "==2.39.1a0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
