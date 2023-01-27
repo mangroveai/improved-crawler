@@ -21,4 +21,4 @@ cdk deploy
 
 To test the solution, you can upload a json (for example example_json) in bucket/db/
 
-You can then run teh crawler or the Glue Workflow to test them
+You can then run the crawler or the Glue Workflow to test them
