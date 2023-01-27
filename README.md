@@ -21,4 +21,26 @@ cdk deploy
 
 To test the solution, you can upload a json (for example example_json) in bucket/db/
 
+Then run the Glue Workflow a first time
 You can then run the crawler or the Glue Workflow to test them
+```
+start-workflow-run --name <your workflow name>
+```
+To see the results of this first launch
+```
+aws logs tail /aws-glue/crawlers --log-stream-names <you crawler name> --follow
+```
+If all went right, you should see that the crawler did something (the number of unique events received should be 1 or more)
+
+You can then redo these two commands to see what the second execution is doing
+```
+start-workflow-run --name <your workflow name>
+```
+```
+aws logs tail /aws-glue/crawlers --log-stream-names <you crawler name> --follow
+```
+Now the number of unique events should be 0 and the crawler should have done nothing
+To then delete the stack :
+```
+cdk destroy
+```
