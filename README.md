@@ -21,8 +21,7 @@ cdk deploy
 
 To test the solution, you can upload a json (for example example_json) in bucket/db/
 
-Then run the Glue Workflow a first time
-You can then run the crawler or the Glue Workflow to test them
+Then run the Glue Workflow a first time. For the following commands, the name of the workflow and of the crawler are displayed as output of the stak
 ```
 start-workflow-run --name <your workflow name>
 ```

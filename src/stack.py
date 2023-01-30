@@ -1,4 +1,4 @@
-from aws_cdk import Duration, Stack
+from aws_cdk import Duration, Stack, CfnOutput
 from aws_cdk import aws_glue as glue
 from aws_cdk import aws_glue_alpha as glue_alpha
 from aws_cdk import aws_iam as iam
@@ -217,3 +217,5 @@ class CrawlerStack(Stack):
                 ]
             ),
         )
+        CfnOutput(self, "crawlerName", value=crawler.ref)
+        CfnOutput(self, "workflowName", value=workflow.ref)
