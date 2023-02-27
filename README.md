@@ -14,7 +14,7 @@ to install the required libraries and then :
 ```
 poetry shell
 ```
-To actvate the virtual environment.
+To activate the virtual environment.
 ```
 cdk deploy
 ```
