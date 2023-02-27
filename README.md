@@ -1,6 +1,9 @@
 # improved-crawler
 A CDK example of a Glue Crawler based on [S3 event notifications](https://docs.aws.amazon.com/glue/latest/dg/crawler-s3-event-notifications.html).
 
+Here is a look at what is being deployed by this stack :
+<img width="622" alt="image" src="https://user-images.githubusercontent.com/48856634/221613433-d24519dc-1cce-432a-b6fb-53e07f8b8d49.png">
+
 ## Deployment
 Install poetry:
 ```
