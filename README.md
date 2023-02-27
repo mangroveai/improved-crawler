@@ -33,7 +33,7 @@ If all went right, you should see that the crawler did something (the number of 
 
 You can then redo these two commands to see what the second execution is doing
 ```
-start-workflow-run --name <your workflow name>
+aws glue start-workflow-run --name <your workflow name>
 ```
 ```
 aws logs tail /aws-glue/crawlers --log-stream-names <you crawler name> --follow
