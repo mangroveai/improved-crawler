@@ -11,7 +11,7 @@ from constructs import Construct
 
 RAW_TABLE = "db"
 NEW_TABLE = "new_table"
-# The S3 path where you will upload your dta will be "s3://{bucket.bucket_name}/{RAW_TABLE}/
+# The S3 path where you will upload your data will be "s3://{bucket.bucket_name}/
 
 
 class CrawlerStack(Stack):
@@ -20,7 +20,7 @@ class CrawlerStack(Stack):
 
         bucket = s3.Bucket(self, "bucket")
 
-        glue_database = glue_alpha.Database(self, "GlueDB", database_name="db")
+        glue_database = glue_alpha.Database(self, "GlueDB", database_name=RAW_TABLE)
 
         crawler_role = iam.Role(
             self,
@@ -78,7 +78,7 @@ class CrawlerStack(Stack):
             targets=glue.CfnCrawler.TargetsProperty(
                 s3_targets=[
                     glue.CfnCrawler.S3TargetProperty(
-                        path=f"s3://{bucket.bucket_name}/{RAW_TABLE}/",
+                        path=f"s3://{bucket.bucket_name}/",
                         event_queue_arn=crawler_event_queue.queue_arn,
                     )
                 ]
@@ -158,12 +158,7 @@ class CrawlerStack(Stack):
                                 "TopicArn": crawler_event_topic.topic_arn,
                                 "Filter": {
                                     "Key": {
-                                        "FilterRules": [
-                                            {
-                                                "Name": "prefix",
-                                                "Value": f"{RAW_TABLE}/",
-                                            },
-                                        ]
+                                        "FilterRules": [] # if you need to filter some prefixes
                                     }
                                 },
                                 "Id": crawler.ref,  # important part if you want the crawler to read the event
@@ -185,12 +180,7 @@ class CrawlerStack(Stack):
                                 "TopicArn": crawler_event_topic.topic_arn,
                                 "Filter": {
                                     "Key": {
-                                        "FilterRules": [
-                                            {
-                                                "Name": "prefix",
-                                                "Value": f"{RAW_TABLE}/",
-                                            },
-                                        ]
+                                        "FilterRules": []
                                     }
                                 },
                                 "Id": crawler.ref,  # important part if you want the crawler to read the event
@@ -219,3 +209,4 @@ class CrawlerStack(Stack):
         )
         CfnOutput(self, "crawlerName", value=crawler.ref)
         CfnOutput(self, "workflowName", value=workflow.ref)
+        CfnOutput(self, "bucketName", value=bucket.bucket_name)
