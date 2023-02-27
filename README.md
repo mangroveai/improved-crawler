@@ -1,24 +1,28 @@
 # improved-crawler
-A CDK example of a crawler that works like in : https://docs.aws.amazon.com/glue/latest/dg/crawler-s3-event-notifications.html
+A CDK example of a Glue Crawler based on [S3 event notifications](https://docs.aws.amazon.com/glue/latest/dg/crawler-s3-event-notifications.html).
 
-The python version of this project is 3.10 or further
-To deploy the project you will just have to do :
+## Deployment
+Install poetry:
 ```
 curl -sSL https://install.python-poetry.org | python3 -
 ```
-To install poetry.
+
+Create Python environment:
 ```
+# The python version of this project is 3.10 or further.
 poetry install
 ```
-to install the required libraries and then :
+Activate the virtual environment:
 ```
 poetry shell
 ```
-To actvate the virtual environment.
+
+Deploy the stack containing the crawler, a bucket and a Glue workflow to run the crawler:
 ```
 cdk deploy
 ```
 
+## Test it!
 To test the solution, you can upload a json (for example example_json) in the bucket:
 ```
 aws s3 cp example_json <your bucket name>
@@ -36,12 +40,14 @@ If all went right, you should see that the crawler did something (the number of 
 
 You can then redo these two commands to see what the second execution is doing
 ```
-start-workflow-run --name <your workflow name>
+aws glue start-workflow-run --name <your workflow name>
 ```
 ```
 aws logs tail /aws-glue/crawlers --log-stream-names <you crawler name> --follow
 ```
 Now the number of unique events should be 0 and the crawler should have done nothing
+
+## Clean up
 To then delete the stack :
 ```
 cdk destroy
