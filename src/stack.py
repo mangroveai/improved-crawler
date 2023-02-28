@@ -156,11 +156,6 @@ class CrawlerStack(Stack):
                             {
                                 "Events": ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"],
                                 "TopicArn": crawler_event_topic.topic_arn,
-                                "Filter": {
-                                    "Key": {
-                                        "FilterRules": [] # if you need to filter some prefixes
-                                    }
-                                },
                                 "Id": crawler.ref,  # important part if you want the crawler to read the event
                             }
                         ],
@@ -178,11 +173,6 @@ class CrawlerStack(Stack):
                             {
                                 "Events": ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"],
                                 "TopicArn": crawler_event_topic.topic_arn,
-                                "Filter": {
-                                    "Key": {
-                                        "FilterRules": []
-                                    }
-                                },
                                 "Id": crawler.ref,  # important part if you want the crawler to read the event
                             }
                         ],

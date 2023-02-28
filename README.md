@@ -28,12 +28,12 @@ cdk deploy
 ## Test it!
 To test the solution, you can upload a json (for example example_json) in the bucket:
 ```
-aws s3 cp example_json <your bucket name>
+aws s3 cp example_json s3://<your bucket name>
 ```
 
 Then run the Glue Workflow a first time. For the following commands, the name of the workflow and of the crawler are displayed as output of the stak
 ```
-start-workflow-run --name <your workflow name>
+aws glue start-workflow-run --name <your workflow name>
 ```
 To see the results of this first launch
 ```
