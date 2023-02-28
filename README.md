@@ -39,7 +39,8 @@ To see the results of this first launch
 ```
 aws logs tail /aws-glue/crawlers --log-stream-names <you crawler name> --follow
 ```
-If all went right, you should see that the crawler did something (the number of unique events received should be 1 or more)
+If all went right, you should have something like that:
+![cli logs drawio](https://user-images.githubusercontent.com/48856634/221797944-eea8c7ca-b0bf-4668-b26c-0beb8a0a9177.png)
 
 You can then redo these two commands to see what the second execution is doing
 ```
@@ -48,7 +49,8 @@ aws glue start-workflow-run --name <your workflow name>
 ```
 aws logs tail /aws-glue/crawlers --log-stream-names <you crawler name> --follow
 ```
-Now the number of unique events should be 0 and the crawler should have done nothing
+Now the number of unique events should be 0 and the crawler should have done nothing:
+![cli logs2 drawio](https://user-images.githubusercontent.com/48856634/221798333-7c72d7c0-ad86-4258-8c7f-726cf7bc4370.png)
 
 ## Clean up
 To then delete the stack :
