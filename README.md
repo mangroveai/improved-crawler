@@ -36,8 +36,9 @@ Then run the Glue Workflow a first time. For the following commands, the name of
 ```
 aws glue start-workflow-run --name <your workflow name>
 ```
-To see the results of this first launch
+To see the results of this first launch:
 ```
+# This command might fail at the beginning as the log group has to be created the first time the crawler is launched
 aws logs tail /aws-glue/crawlers --log-stream-names <you crawler name> --follow
 ```
 If all went right, you should have something like that:
