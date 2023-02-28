@@ -22,6 +22,7 @@ poetry shell
 
 Deploy the stack containing the crawler, a bucket and a Glue workflow to run the crawler:
 ```
+# It is assumed that you have valid AWS credentials
 cdk deploy
 ```
 
