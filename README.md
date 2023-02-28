@@ -1,4 +1,4 @@
-# improved-crawler
+# A more efficient Glue Crawler
 A CDK example of a Glue Crawler based on [S3 event notifications](https://docs.aws.amazon.com/glue/latest/dg/crawler-s3-event-notifications.html).
 
 Here is a look at what is being deployed by this stack :
